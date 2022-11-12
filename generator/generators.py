@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def generate(generator=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min_radius=1/40):
+def shapes(generator=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min_radius=1/40):
   params = np.zeros((num_shapes,5))
   params[:,0] = generator.integers(2,5,size=num_shapes)
   params[:,1:5] = generator.random((num_shapes,4))
