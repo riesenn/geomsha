@@ -19,24 +19,24 @@ def gen_shapes(generator=np.random.default_rng(100), num_shapes=25,max_radius=1/
 
 
 def gen_image(shapes, im_size=160,lnw = 0.2):
+  sha = shapes.copy()
+  sha[:,1:4] = sha[:,1:4]*im_size
   fig, ax = plt.subplots(figsize=(1,1), dpi=im_size)
   plt.axis('scaled')
   plt.axis('off')
   plt.xlim(0, im_size)
   plt.ylim(0, im_size)
   plt.subplots_adjust(bottom=0.0, left=0.0, right=1.0, top=1.0)
-    
-  for s in shapes:
+  for s in sha:
     if s[0] < 3:
       ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=lnw, fc='b', fill=False))
     else:
       ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=lnw,fc='b',fill=False))
-
   img_buf = io.BytesIO()
   fig.set(figwidth=1, figheight=1, dpi=im_size)
   fig.savefig(img_buf, format='png', transparent=False, dpi=im_size)
   img = Image.open(img_buf).convert('L')
-  #img = np.asarray(img,dtype=np.uint8)
+  img = np.asarray(img,dtype=np.uint8)
   img_buf.close()
 
-  return (img,shapes) 
+  return (img,sha) 
