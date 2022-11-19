@@ -32,11 +32,7 @@ def gen_image(shapes, im_size=160,lnw = 0.2):
       ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=lnw, fc='b', fill=False))
     else:
       ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=lnw,fc='b',fill=False))
-  img_buf = io.BytesIO()
   fig.set(figwidth=1, figheight=1, dpi=im_size)
-  fig.savefig(img_buf, format='png', transparent=False, dpi=im_size)
-  img = Image.open(img_buf).convert('L')
-  img = np.asarray(img,dtype=np.uint8)
-  img_buf.close()
-
-  return (img,sha) 
+  fig.canvas.draw()
+  img = np.array(fig.canvas.renderer.buffer_rgba())
+  return (img[:,:,0],sha) 
