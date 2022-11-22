@@ -41,8 +41,10 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160,
   for s in sha:
     if s[0] < 3:
       ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=s[5], fc='b', fill=False))
+      ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
     else:
       ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=s[5],fc='b',fill=False))
+      ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
   if not noise is None:
     nse = np.c_[noise.copy(),rnd.random(len(noise))]
     nse[:,0:3] = nse[:,0:3]*im_size
