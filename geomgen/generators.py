@@ -28,7 +28,7 @@ def gen_noise(rnd=np.random.default_rng(100), num_noise=500, max_line=1/20, min_
   return params
 
 
-def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160, max_lw=0.15, min_lw=0.1):
+def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160, max_lw=0.15, min_lw=0.1, show_center=False):
   sha = np.c_[shapes.copy(),rnd.random(len(shapes))]
   sha[:,1:4] = sha[:,1:4]*im_size
   sha[:,5] = min_lw+sha[:,5]*(max_lw-min_lw)
@@ -41,10 +41,10 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160,
   for s in sha:
     if s[0] < 3:
       ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=s[5], fc='b', fill=False))
-      ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
+      if show_center: ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
     else:
       ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=s[5],fc='b',fill=False))
-      ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
+      if show_center: ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
   if not noise is None:
     nse = np.c_[noise.copy(),rnd.random(len(noise))]
     nse[:,0:3] = nse[:,0:3]*im_size
