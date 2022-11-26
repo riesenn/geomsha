@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def gen_shapes(rnd=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min_radius=1/40, no_rotation=False, no_scaling=False):
+def gen_shapes(rnd=np.random.default_rng(), num_shapes=25,max_radius=1/20,min_radius=1/40, no_rotation=False, no_scaling=False):
   params = np.zeros((num_shapes,5))
   params[:,0] = rnd.integers(2,5,size=num_shapes)
   params[:,1:5] = rnd.random((num_shapes,4))
@@ -21,16 +21,16 @@ def gen_shapes(rnd=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min
   return params
 
 
-def gen_noise(rnd=np.random.default_rng(100), num_noise=500, max_line=1/20, min_line=1/80):
+def gen_noise(rnd=np.random.default_rng(), num_noise=500, max_line=1/20, min_line=1/80):
   params = rnd.random((num_noise,4))
   params[:,2] = min_line+params[:,2]*(max_line-min_line)
-  params[:,3] = params[:,3]*2*np.pi
-  for p in params:
-    p[0:2] = p[0:2]*(1-2*p[2])+p[2]
+  params[:,0] = params[:,2]+np.multiply(params[:,0],1-2*params[:,2])
+  params[:,1] = params[:,2]+np.multiply(params[:,1],1-2*params[:,2])
+  params[:,2:4] = np.c_[params[:,0]+np.multiply(params[:,2],np.cos(params[:,3]*2*np.pi)),params[:,1]+np.multiply(params[:,2],np.sin(params[:,3]*2*np.pi))]
   return params
 
 
-def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160, max_lw=0.15, min_lw=0.1, show_center=False):
+def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, max_lw=0.15, min_lw=0.1, show_center=False):
   sha = np.c_[shapes.copy(),rnd.random(len(shapes))]
   sha[:,1:4] = sha[:,1:4]*im_size
   sha[:,5] = min_lw+sha[:,5]*(max_lw-min_lw)
@@ -49,10 +49,10 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(100), im_size=160,
       if show_center: ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
   if not noise is None:
     nse = np.c_[noise.copy(),rnd.random(len(noise))]
-    nse[:,0:3] = nse[:,0:3]*im_size
+    nse[:,0:4] = nse[:,0:4]*im_size
     nse[:,4] = min_lw+nse[:,4]*(max_lw-min_lw)
     for n in nse:
-      ax.add_line(matplotlib.lines.Line2D((n[0],n[0]+[np.cos(n[3])*n[2]]),(n[1],n[1]+[np.sin(n[3])*n[2]]),lw=n[4],c='k'))
+      ax.add_line(matplotlib.lines.Line2D((n[0],n[2]),(n[1],n[3]),lw=n[4],c='k'))
   else:
     nse = None  
   fig.set(figwidth=1, figheight=1, dpi=im_size)
