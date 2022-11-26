@@ -5,17 +5,19 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def gen_shapes(rnd=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min_radius=1/40):
+def gen_shapes(rnd=np.random.default_rng(100), num_shapes=25,max_radius=1/20,min_radius=1/40, no_rotation=False, no_scaling=False):
   params = np.zeros((num_shapes,5))
   params[:,0] = rnd.integers(2,5,size=num_shapes)
   params[:,1:5] = rnd.random((num_shapes,4))
-  params[:,3] = min_radius+params[:,3]*(max_radius-min_radius)
-  for p in params:
-    p[1:3] = p[1:3]*(1-2*p[3])+p[3]
-    if p[0] < 3:
-      p[4] = 0
-    else:
-      p[4] = p[4]*2*np.pi/p[0]
+  if no_rotation: params[:,4] = 0
+  if no_scaling: params[:,3] = max_radius
+  else: params[:,3] = min_radius+params[:,3]*(max_radius-min_radius)
+  params[:,1] = params[:,3]+np.multiply(params[:,1],1-2*params[:,3])
+  params[:,2] = params[:,3]+np.multiply(params[:,2],1-2*params[:,3])
+  idx = params[:,0] < 3
+  params[idx,4] = 0
+  idx = np.logical_not(idx)
+  params[idx,4] = np.multiply(params[idx,4],2*np.pi/params[idx,0])
   return params
 
 
