@@ -1,1 +1,1 @@
-# data
+# Folder for temporary data

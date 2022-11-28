@@ -1,11 +1,32 @@
-import io
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from PIL import Image
 
 
 def gen_shapes(rnd=np.random.default_rng(), num_shapes=25,max_radius=1/20,min_radius=1/40, no_rotation=False, no_scaling=False):
+  """Generates some random geometric shapes, i.e. the corresponding parameter set
+
+  Parameters
+  ----------
+  rnd : Generator
+    The random generator for position, size, form and rotation of the basic shapes 
+  num_shapes : int
+    Number of shapes to be generated
+  max_radius : float
+    Maximum circumcircle size relative to 1
+  min_radius : float
+    Minimum circumcircle size relative to 1
+  no_rotation : bool
+    Flag for the shapes to be rotated or not
+  no_scaling : bool
+    Flag for the shapes to be scaled between min and max circumcircle
+
+  Returns
+  -------
+  params : ndarray
+      An array of size=(num_shapes,5) of all the parameters of the shapes
+  """
+
   params = np.zeros((num_shapes,5))
   params[:,0] = rnd.integers(2,5,size=num_shapes)
   params[:,1:5] = rnd.random((num_shapes,4))
@@ -22,6 +43,25 @@ def gen_shapes(rnd=np.random.default_rng(), num_shapes=25,max_radius=1/20,min_ra
 
 
 def gen_noise(rnd=np.random.default_rng(), num_noise=500, max_line=1/20, min_line=1/80):
+  """Generates some random lines aka noise, i.e. the corresponding parameter set
+
+  Parameters
+  ----------
+  rnd : Generator
+    The random generator for position, size and rotation of the lines 
+  num_noise : int
+    Number of lines to be generated
+  max_line : float
+    Maximum length of a line relative to 1
+  min_line : float
+    Minimum length of a line relative to 1
+
+  Returns
+  -------
+  params : ndarray
+    An array of size=(num_noise,4) of all the parameters of the lines
+  """
+
   params = rnd.random((num_noise,4))
   params[:,2] = min_line+params[:,2]*(max_line-min_line)
   params[:,0] = params[:,2]+np.multiply(params[:,0],1-2*params[:,2])
@@ -31,6 +71,34 @@ def gen_noise(rnd=np.random.default_rng(), num_noise=500, max_line=1/20, min_lin
 
 
 def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, max_lw=0.15, min_lw=0.1, show_center=False):
+  """Generates an image with geometric shapes and noise on it
+
+  Parameters
+  ----------
+  shapes : ndarray
+    A list of shapes to draw 
+  noise : ndarray
+    A list of lines to draw
+  rnd : Generator
+    Generator for random numbers representing the line width of different shapes
+  im_size : int
+    The width and hight of the image (in pixel)
+  max_line : float
+    Maximum line width
+  min_line : float
+    Minimum line width
+  show_center : bool
+    Flag for drawing each center of the shapes circumcircles 
+
+  Returns
+  -------
+  img : ndarray
+    An array of size=(im_size,im_size) containing the greyscale values of each pixel
+  sha : ndarray
+    The array of shape parameters relativ to im_size
+  nse : ndarray
+    The array of noise i.e. line parameters relativ to im_size
+  """
   sha = np.c_[shapes.copy(),rnd.random(len(shapes))]
   sha[:,1:4] = sha[:,1:4]*im_size
   sha[:,5] = min_lw+sha[:,5]*(max_lw-min_lw)
