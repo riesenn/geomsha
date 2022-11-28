@@ -47,14 +47,13 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, ma
     else:
       ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=s[5],fc='b',fill=False))
       if show_center: ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
-  if not noise is None:
+  if noise is None: nse = None
+  else:
     nse = np.c_[noise.copy(),rnd.random(len(noise))]
     nse[:,0:4] = nse[:,0:4]*im_size
     nse[:,4] = min_lw+nse[:,4]*(max_lw-min_lw)
     for n in nse:
       ax.add_line(matplotlib.lines.Line2D((n[0],n[2]),(n[1],n[3]),lw=n[4],c='k'))
-  else:
-    nse = None  
   fig.set(figwidth=1, figheight=1, dpi=im_size)
   fig.canvas.draw()
   img = np.array(fig.canvas.renderer.buffer_rgba())
