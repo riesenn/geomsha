@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.collections import PatchCollection
 
 
 def gen_shapes(rnd=np.random.default_rng(), num_shapes=25,max_radius=1/20,min_radius=1/40, no_rotation=False, no_scaling=False):
@@ -111,15 +112,16 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, ma
     plt.ylim(0, im_size)
     plt.subplots_adjust(bottom=0.0, left=0.0, right=1.0, top=1.0)
     ax = plt.gca()
+    patches = []
     for s in sha:
         if s[0] < 3:
-            ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=s[5], fc='b', fill=False))
+            patches.append(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=s[5], fc='b', fill=False))
             if show_center:
-                ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
+                patches.append(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
         else:
-            ax.add_patch(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=s[5],fc='b',fill=False))
+            patches.append(matplotlib.patches.RegularPolygon(s[1:3],numVertices=int(s[0]),radius=s[3],orientation=s[4],lw=s[5],fc='b',fill=False))
             if show_center:
-                ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
+                patches.append(matplotlib.patches.Circle(s[1:3], radius=.5, lw=2, fc='b'))
     if noise is None:
         nse = None
     else:
@@ -127,11 +129,13 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, ma
         nse[:,0:4] = nse[:,0:4]*im_size
         nse[:,4] = min_lw+nse[:,4]*(max_lw-min_lw)
         for n in nse:
-            ax.add_line(matplotlib.lines.Line2D((n[0],n[2]),(n[1],n[3]),lw=n[4],c='k'))
+            patches.append(matplotlib.lines.Line2D((n[0],n[2]),(n[1],n[3]),lw=n[4],c='k'))
+    ax.add_collection(PatchCollection(patches))
     fig = plt.gcf()
     fig.set(figwidth=1, figheight=1, dpi=im_size)
     fig.canvas.draw()
     img = np.array(fig.canvas.renderer.buffer_rgba())
+    fig.canvas.flush_events()
     plt.cla()
     return (img[:,:,0],sha,nse)
 
