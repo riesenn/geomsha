@@ -105,12 +105,12 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, ma
     sha = np.c_[shapes.copy(),rnd.random(len(shapes))]
     sha[:,1:4] = sha[:,1:4]*im_size
     sha[:,5] = min_lw+sha[:,5]*(max_lw-min_lw)
-    fig, ax = plt.subplots(figsize=(1,1), dpi=im_size)
     plt.axis('scaled')
     plt.axis('off')
     plt.xlim(0, im_size)
     plt.ylim(0, im_size)
     plt.subplots_adjust(bottom=0.0, left=0.0, right=1.0, top=1.0)
+    ax = plt.gca()
     for s in sha:
         if s[0] < 3:
             ax.add_patch(matplotlib.patches.Circle(s[1:3], radius=s[3], lw=s[5], fc='b', fill=False))
@@ -128,9 +128,11 @@ def gen_image(shapes, noise = None, rnd=np.random.default_rng(), im_size=160, ma
         nse[:,4] = min_lw+nse[:,4]*(max_lw-min_lw)
         for n in nse:
             ax.add_line(matplotlib.lines.Line2D((n[0],n[2]),(n[1],n[3]),lw=n[4],c='k'))
+    fig = plt.gcf()
     fig.set(figwidth=1, figheight=1, dpi=im_size)
     fig.canvas.draw()
     img = np.array(fig.canvas.renderer.buffer_rgba())
+    plt.cla()
     return (img[:,:,0],sha,nse)
 
 
